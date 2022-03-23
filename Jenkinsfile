@@ -21,6 +21,7 @@ pipeline {
       }
       steps {
         echo 'Hello !! this is version 1.0'
+        bat 'mvn test'
       }
     }
 
