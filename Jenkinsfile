@@ -1,29 +1,35 @@
 pipeline {
-  agent {
-    node {
-      label 'slave 1'
+    agent {
+        label 'master'
     }
-
-  }
-  stages {
-    stage('Build') {
-      steps {
-        bat 'mvn -B -DskipTests clean package'
-      }
-    }
-
-    stage('Test') {
-      post {
-        always {
-          junit 'target/surefire-reports/*.xml'
+    stages {
+        stage('Build') {
+            steps {
+                bat 'mvn -B -DskipTests clean package'
+            }
+        }
+        
+        stage('Test') { 
+            steps {
+                bat 'mvn test' 
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml' 
+                }
+            }
+        }
+        
+        stage('Sonar-Report') {
+            steps {
+                bat 'mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.analysis.mode=publish'
+            }
         }
 
-      }
-      steps {
-        echo 'Hello !! this is version 1.0'
-        bat 'mvn test'
-      }
+        stage('Deploy') {
+            steps {
+                bat 'mvn clean deploy'
+            }
+        }
     }
-
-  }
 }
